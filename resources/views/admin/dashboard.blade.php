@@ -64,14 +64,16 @@
             <h2 class="text-lg font-semibold">Aksi Cepat</h2>
         </div>
         <div class="grid grid-cols-2 gap-4">
-            <a href="{{ route('admin.categories.create') }}" class="p-4 border border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors text-center">
-                <i class="fas fa-plus text-3xl text-green-600 mb-2"></i>
-                <p class="font-medium">Tambah Kategori</p>
-            </a>
-            <a href="{{ route('admin.products.create') }}" class="p-4 border border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors text-center">
-                <i class="fas fa-plus text-3xl text-blue-600 mb-2"></i>
-                <p class="font-medium">Tambah Produk</p>
-            </a>
+            @if(auth()->user()->role === 'admin')
+                <a href="{{ route('admin.categories.create') }}" class="p-4 border border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors text-center">
+                    <i class="fas fa-plus text-3xl text-green-600 mb-2"></i>
+                    <p class="font-medium">Tambah Kategori</p>
+                </a>
+                <a href="{{ route('admin.products.create') }}" class="p-4 border border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors text-center">
+                    <i class="fas fa-plus text-3xl text-blue-600 mb-2"></i>
+                    <p class="font-medium">Tambah Produk</p>
+                </a>
+            @endif
             <a href="{{ route('admin.categories.index') }}" class="p-4 border border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors text-center">
                 <i class="fas fa-list text-3xl text-purple-600 mb-2"></i>
                 <p class="font-medium">Kelola Kategori</p>
@@ -99,9 +101,11 @@
                             <p class="font-medium">{{ $product->name }}</p>
                             <p class="text-sm text-gray-500">Stok: {{ $product->stock }} (Min: {{ $product->min_stock }})</p>
                         </div>
-                        <a href="{{ route('admin.products.edit', $product) }}" class="text-sm text-green-600 hover:text-green-800">
-                            <i class="fas fa-edit mr-1"></i>Edit
-                        </a>
+                        @if(auth()->user()->role === 'admin')
+                            <a href="{{ route('admin.products.edit', $product) }}" class="text-sm text-green-600 hover:text-green-800">
+                                <i class="fas fa-edit mr-1"></i>Edit
+                            </a>
+                        @endif
                     </div>
                 @endforeach
             </div>

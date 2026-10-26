@@ -1,64 +1,46 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace Database\Seeders;
 
-use App\Http\Controllers\Controller;
+use Illuminate\Database\Seeder;
 use App\Models\Category;
-use Illuminate\Http\Request;
 
-class CategoryController extends Controller
+class CategorySeeder extends Seeder
 {
-    public function index()
+    public function run(): void
     {
-        // Ambil semua kategori beserta jumlah produk yang ada di dalamnya
-        $categories = Category::withCount('products')->orderBy('order', 'asc')->get();
-        return view('admin.categories.index', compact('categories'));
-    }
+        $categories = [
+            [
+                'name' => 'Jus Buah',
+                'description' => 'Aneka jus buah segar pilihan',
+                'sort_order' => 1,
+                'color' => '#FF6B6B',
+            ],
+            [
+                'name' => 'Es Jeruk',
+                'description' => 'Minuman jeruk segar',
+                'sort_order' => 2,
+                'color' => '#FFA500',
+            ],
+            [
+                'name' => 'Capcin',
+                'description' => 'Minuman cappuccino cincau',
+                'sort_order' => 3,
+                'color' => '#8B4513',
+            ],
+            [
+                'name' => 'Pop Ice',
+                'description' => 'Minuman Pop Ice aneka rasa',
+                'sort_order' => 4,
+                'color' => '#9370DB',
+            ],
+        ];
 
-    public function create()
-    {
-        return view('admin.categories.create');
-    }
-
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'order' => 'nullable|integer',
-        ]);
-
-        Category::create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'order' => $request->order ?? 1,
-            'status' => 'active',
-            'color' => '#FF6B6B',
-        ]);
-
-        return redirect()->route('admin.categories.index')->with('success', 'Kategori berhasil ditambahkan!');
-    }
-
-    public function edit(Category $category)
-    {
-        return view('admin.categories.edit', compact('category'));
-    }
-
-    public function update(Request $request, Category $category)
-    {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
-
-        $category->update($request->only('name', 'description', 'order', 'status'));
-
-        return redirect()->route('admin.categories.index')->with('success', 'Kategori berhasil diperbarui!');
-    }
-
-    public function destroy(Category $category)
-    {
-        $category->delete();
-        return redirect()->route('admin.categories.index')->with('success', 'Kategori berhasil dihapus!');
+        foreach ($categories as $category) {
+            Category::updateOrCreate(
+                ['name' => $category['name']],
+                array_merge($category, ['is_active' => true])
+            );
+        }
     }
 }

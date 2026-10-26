@@ -38,15 +38,15 @@
                         </div>
                         <h2 class="text-lg font-bold text-gray-800">Detail Pesanan</h2>
                     </div>
-                    <span class="px-3 py-1 bg-orange-50 text-orange-600 rounded-full text-sm font-medium">{{ $cart->count() }} Item</span>
+                    <span class="px-3 py-1 bg-orange-50 text-orange-600 rounded-full text-sm font-medium">{{ count($cart) }} Item</span>
                 </div>
                 
                 <div class="divide-y divide-gray-100">
                     @foreach($cart as $item)
                         <div class="p-5 flex gap-4 items-center">
                             <div class="relative w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden" style="background: linear-gradient(135deg, #FFE0E0 0%, #FFF5E0 100%)">
-                                @if($item['image'])
-                                    <img src="{{ asset('storage/' . $item['image']) }}" alt="{{ $item['name'] }}" class="w-full h-full object-cover">
+                                @if(!empty($item['image']))
+                                    <img src="{{ str_starts_with($item['image'], 'http') ? $item['image'] : asset($item['image']) }}" alt="{{ $item['name'] }}" class="w-full h-full object-cover">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center">
                                         <i class="fas fa-glass-whiskey text-xl text-orange-300"></i>
@@ -140,7 +140,7 @@
                 
                 <div class="space-y-3 mb-5">
                     <div class="flex justify-between text-gray-600">
-                        <span>Subtotal ({{ $cart->sum('quantity') }} item)</span>
+                        <span>Subtotal ({{ collect($cart)->sum('quantity') }} item)</span>
                         <span class="font-medium text-gray-800">Rp {{ number_format($subtotal, 0, ',', '.') }}</span>
                     </div>
                     <div class="border-t border-gray-200 pt-3 flex justify-between text-xl">
@@ -168,7 +168,7 @@
                     </h3>
                     <div class="text-center">
                         <div class="w-48 h-48 mx-auto mb-4 bg-white rounded-xl p-3 border border-blue-200">
-                            <img src="{{ asset('storage/qris-placeholder.svg') }}" alt="QRIS Code" class="w-full h-full object-contain">
+                            <img src="{{ asset('images/qris-placeholder.svg') }}" alt="QRIS Code" class="w-full h-full object-contain" onerror="this.src='https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=AlAfghaniJuice'">
                         </div>
                         <p class="text-blue-700 font-medium">Scan QR Code untuk bayar</p>
                         <p class="text-xs text-blue-500 mt-1">Total: <span class="font-bold">Rp {{ number_format($total, 0, ',', '.') }}</span></p>
@@ -217,7 +217,6 @@
                 selectedDiv.classList.add('ring-2', 'ring-blue-400');
             }
             
-            // Show/hide payment sections
             const qrisSection = document.getElementById('qris-section');
             const cashSection = document.getElementById('cash-section');
             if (e.target.value === 'qris') {
@@ -230,14 +229,12 @@
         });
     });
     
-    // Form validation feedback
     document.getElementById('checkout-form')?.addEventListener('submit', (e) => {
         const btn = e.target.querySelector('button[type="submit"]');
         btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
         btn.disabled = true;
     });
     
-    // Initialize on load
     document.addEventListener('DOMContentLoaded', () => {
         const checked = document.querySelector('.payment-option input:checked');
         if (checked) {

@@ -34,17 +34,18 @@
         </div>
     </div>
     
-    <div class="bg-white rounded-xl shadow-md p-6">
+    <a href="{{ route('cashier.orders.history') }}" class="bg-white rounded-xl shadow-md p-6 block hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-yellow-400" aria-label="Buka riwayat pesanan dan pendapatan">
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm text-gray-500">Pendapatan Hari Ini</p>
                 <p class="text-3xl font-bold text-gray-800">Rp {{ number_format($todayStats['total_revenue'], 0, ',', '.') }}</p>
             </div>
-            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+            <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center" title="Klik untuk membuka riwayat pesanan">
                 <i class="fas fa-coins text-2xl text-yellow-600"></i>
             </div>
         </div>
-    </div>
+        <p class="mt-3 text-xs text-yellow-700">Klik untuk melihat riwayat pesanan <i class="fas fa-arrow-right ml-1"></i></p>
+    </a>
     
     <div class="bg-white rounded-xl shadow-md p-6">
         <div class="flex items-center justify-between">
@@ -79,29 +80,6 @@
             <div class="space-y-4">
                 @foreach($pendingOrders as $order)
                     @include('cashier.partials.order-card', ['order' => $order, 'showConfirm' => true])
-                @endforeach
-            </div>
-        @endif
-    </div>
-
-    <!-- Preparing Orders -->
-    <div>
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-semibold text-gray-800 flex items-center gap-2">
-                <i class="fas fa-utensils text-blue-500"></i>
-                Sedang Disiapkan ({{ $preparingOrders->count() }})
-            </h2>
-        </div>
-        
-        @if($preparingOrders->isEmpty())
-            <div class="bg-white rounded-xl shadow-md p-8 text-center">
-                <i class="fas fa-utensils text-4xl text-gray-300 mb-2"></i>
-                <p class="text-gray-500">Tidak ada pesanan dalam persiapan</p>
-            </div>
-        @else
-            <div class="space-y-4">
-                @foreach($preparingOrders as $order)
-                    @include('cashier.partials.order-card', ['order' => $order])
                 @endforeach
             </div>
         @endif

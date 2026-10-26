@@ -21,10 +21,31 @@
                 </div>
                 
                 <div class="flex items-center gap-3">
-                    <a href="{{ route('login') }}" class="px-4 py-2.5 bg-white/25 hover:bg-white/35 backdrop-blur-sm rounded-full text-white text-sm font-bold transition-all flex items-center gap-2 shadow-md hover:scale-105 active:scale-95">
-                        <i class="fas fa-user-shield text-base"></i>
-                        <span>Login Admin</span>
-                    </a>
+                    @auth
+                        @if(auth()->user()->isAdmin() || auth()->user()->role === 'analyst')
+                            <a href="{{ route('admin.dashboard') }}" class="px-4 py-2.5 bg-white/25 hover:bg-white/35 backdrop-blur-sm rounded-full text-white text-sm font-bold transition-all flex items-center gap-2 shadow-md hover:scale-105 active:scale-95">
+                                <i class="fas fa-gauge-high text-base"></i>
+                                <span>Dashboard Admin</span>
+                            </a>
+                        @elseif(auth()->user()->isCashier())
+                            <a href="{{ route('cashier.dashboard') }}" class="px-4 py-2.5 bg-white/25 hover:bg-white/35 backdrop-blur-sm rounded-full text-white text-sm font-bold transition-all flex items-center gap-2 shadow-md hover:scale-105 active:scale-95">
+                                <i class="fas fa-cash-register text-base"></i>
+                                <span>Dashboard Kasir</span>
+                            </a>
+                        @endif
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="px-4 py-2.5 bg-white/25 hover:bg-white/35 backdrop-blur-sm rounded-full text-white text-sm font-bold transition-all flex items-center gap-2 shadow-md hover:scale-105 active:scale-95">
+                                <i class="fas fa-sign-out-alt text-base"></i>
+                                <span>Logout</span>
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ route('login') }}" class="px-4 py-2.5 bg-white/25 hover:bg-white/35 backdrop-blur-sm rounded-full text-white text-sm font-bold transition-all flex items-center gap-2 shadow-md hover:scale-105 active:scale-95">
+                            <i class="fas fa-user-shield text-base"></i>
+                            <span>Login Admin</span>
+                        </a>
+                    @endauth
 
                     <a href="{{ route('customer.cart.index') }}" id="cart-icon-btn" class="relative p-3 rounded-full bg-white/25 hover:bg-white/35 backdrop-blur-sm transition-all shadow-md hover:scale-105 active:scale-95">
                         <i class="fas fa-shopping-cart text-xl text-white"></i>
@@ -104,7 +125,7 @@
                 <div class="relative h-56 overflow-hidden flex items-center justify-center bg-gray-50/50">
                     <div class="w-full h-full flex items-center justify-center overflow-hidden">
                         @if($product->image && !str_contains($product->image, '<svg') && strlen($product->image) > 5)
-                            <img src="{{ str_starts_with($product->image, 'http') ? $product->image : asset('storage/' . $product->image) }}" 
+                            <img src="{{ str_starts_with($product->image, 'http') ? $product->image : asset($product->image) }}"
                                  alt="{{ $product->name }}" 
                                  onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                                  class="w-full h-full object-cover scale-110 translate-y-3 transition-transform duration-300 hover:scale-115">

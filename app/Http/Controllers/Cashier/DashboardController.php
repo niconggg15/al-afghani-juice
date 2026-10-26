@@ -16,9 +16,15 @@ class DashboardController extends Controller
         $readyOrders = Order::with(['items.product', 'payment'])->where('status', 'ready')->latest()->get();
         
         // Statistik hari ini dalam bentuk variabel individu
-        $totalOrdersToday = Order::whereDate('created_at', today())->count();
-        $completedOrdersToday = Order::whereDate('created_at', today())->where('status', 'completed')->count();
-        $revenueToday = Order::whereDate('created_at', today())->where('status', 'completed')->sum('total');
+        $totalOrdersToday = Order::where(function ($query) {
+            $query->whereDate('created_at', today())
+                ->orWhere(function ($completed) {
+                    $completed->where('status', 'completed')
+                        ->whereDate('completed_at', today());
+                });
+        })->count();
+        $completedOrdersToday = Order::whereDate('completed_at', today())->where('status', 'completed')->count();
+        $revenueToday = Order::whereDate('completed_at', today())->where('status', 'completed')->sum('total');
 
         // Statistik hari ini dalam bentuk array (untuk mengantisipasi $todayStats di view)
         $todayStats = [

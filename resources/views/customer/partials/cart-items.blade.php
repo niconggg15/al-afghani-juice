@@ -10,7 +10,7 @@
                 <!-- Product Image -->
                 <div class="relative w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden" style="background: linear-gradient(135deg, #FFE0E0 0%, #FFF5E0 100%)">
                     @if($item['image'])
-                        <img src="{{ asset('storage/' . $item['image']) }}" alt="{{ $item['name'] }}" class="w-full h-full object-cover">
+                        <img src="{{ str_starts_with($item['image'], 'http') ? $item['image'] : (str_starts_with($item['image'], 'images/') ? asset($item['image']) : asset('storage/' . $item['image'])) }}" alt="{{ $item['name'] }}" class="w-full h-full object-cover">
                     @else
                         <div class="w-full h-full flex items-center justify-center">
                             <i class="fas fa-glass-whiskey text-2xl text-orange-300"></i>

@@ -46,11 +46,14 @@ class ProductController extends Controller
 
         $data = $request->only(['category_id', 'name', 'description', 'price', 'stock', 'min_stock', 'is_active', 'is_featured']);
 
-        // Jika mengupload foto, simpan ke storage. Jika tidak, kosongkan agar otomatis pakai tampilan dummy/minimalis di menu.
+        // Simpan langsung ke folder public/images tanpa storage:link
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('products', 'public');
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images'), $filename);
+            $data['image'] = 'images/' . $filename;
         } else {
-            $data['image'] = null; // Otomatis menggunakan ilustrasi gelas dummy di halaman menu
+            $data['image'] = null; 
         }
 
         Product::create($data);
@@ -87,7 +90,15 @@ class ProductController extends Controller
         $data = $request->only(['category_id', 'name', 'description', 'price', 'stock', 'min_stock', 'is_active', 'is_featured']);
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('products', 'public');
+            // Hapus foto lama jika ada
+            if ($product->image && file_exists(public_path($product->image))) {
+                @unlink(public_path($product->image));
+            }
+
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images'), $filename);
+            $data['image'] = 'images/' . $filename;
         }
 
         $product->update($data);
@@ -99,6 +110,11 @@ class ProductController extends Controller
     {
         if ($product->orderItems()->exists()) {
             return back()->with('error', 'Produk tidak bisa dihapus karena sudah ada di pesanan');
+        }
+
+        // Hapus file gambar fisik jika ada
+        if ($product->image && file_exists(public_path($product->image))) {
+            @unlink(public_path($product->image));
         }
 
         $product->delete();

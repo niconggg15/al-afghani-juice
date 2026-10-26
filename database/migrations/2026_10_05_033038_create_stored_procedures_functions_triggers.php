@@ -16,7 +16,7 @@ return new class extends Migration
         DB::unprepared('DROP TRIGGER IF EXISTS trg_after_order_item_delete');
         DB::unprepared('DROP TRIGGER IF EXISTS trg_before_order_update');
 
-        // Stored Procedure: Create order with transaction
+        // Stored Procedure: Create order with transaction (Tanpa PPN)
         DB::unprepared('
             CREATE PROCEDURE sp_create_order(
                 IN p_customer_name VARCHAR(255),
@@ -82,8 +82,8 @@ return new class extends Migration
                     SET v_i = v_i + 1;
                 END WHILE;
 
-                SET v_tax = v_subtotal * 0.11;
-                SET v_total = v_subtotal + v_tax;
+                SET v_tax = 0;
+                SET v_total = v_subtotal;
 
                 UPDATE orders SET subtotal = v_subtotal, tax = v_tax, total = v_total WHERE id = p_order_id;
 
@@ -118,7 +118,7 @@ return new class extends Migration
             END
         ');
 
-        // Function: Calculate order total
+        // Function: Calculate order total (Tanpa PPN)
         DB::unprepared('
             CREATE FUNCTION fn_calculate_order_total(p_order_id BIGINT)
             RETURNS DECIMAL(10,2)
@@ -131,7 +131,7 @@ return new class extends Migration
                 FROM order_items
                 WHERE order_id = p_order_id;
 
-                RETURN v_total + (v_total * 0.11);
+                RETURN v_total;
             END
         ');
 
@@ -159,7 +159,7 @@ return new class extends Migration
             END
         ');
 
-        // Trigger: After order item insert - update order total
+        // Trigger: After order item insert - update order total (Tanpa PPN)
         DB::unprepared('
             CREATE TRIGGER trg_after_order_item_insert
             AFTER INSERT ON order_items
@@ -173,8 +173,8 @@ return new class extends Migration
                 FROM order_items
                 WHERE order_id = NEW.order_id;
 
-                SET v_tax = v_subtotal * 0.11;
-                SET v_total = v_subtotal + v_tax;
+                SET v_tax = 0;
+                SET v_total = v_subtotal;
 
                 UPDATE orders
                 SET subtotal = v_subtotal, tax = v_tax, total = v_total, updated_at = NOW()
@@ -182,7 +182,7 @@ return new class extends Migration
             END
         ');
 
-        // Trigger: After order item delete - update order total
+        // Trigger: After order item delete - update order total (Tanpa PPN)
         DB::unprepared('
             CREATE TRIGGER trg_after_order_item_delete
             AFTER DELETE ON order_items
@@ -196,8 +196,8 @@ return new class extends Migration
                 FROM order_items
                 WHERE order_id = OLD.order_id;
 
-                SET v_tax = v_subtotal * 0.11;
-                SET v_total = v_subtotal + v_tax;
+                SET v_tax = 0;
+                SET v_total = v_subtotal;
 
                 UPDATE orders
                 SET subtotal = v_subtotal, tax = v_tax, total = v_total, updated_at = NOW()

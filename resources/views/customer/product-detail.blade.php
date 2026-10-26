@@ -7,7 +7,7 @@
     <!-- Product Detail -->
     <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
         @if($product->image)
-            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-64 object-cover">
+            <img src="{{ str_starts_with($product->image, 'http') ? $product->image : (str_starts_with($product->image, 'images/') ? asset($product->image) : asset('storage/' . $product->image)) }}" alt="{{ $product->name }}" class="w-full h-64 object-cover">
         @else
             <div class="w-full h-64 bg-green-100 flex items-center justify-center">
                 <i class="fas fa-glass-whiskey text-6xl text-green-300"></i>
@@ -60,7 +60,7 @@
                 @foreach($relatedProducts as $related)
                     <article class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
                         @if($related->image)
-                            <img src="{{ asset('storage/' . $related->image) }}" alt="{{ $related->name }}" class="w-full h-40 object-cover">
+                            <img src="{{ str_starts_with($related->image, 'http') ? $related->image : (str_starts_with($related->image, 'images/') ? asset($related->image) : asset('storage/' . $related->image)) }}" alt="{{ $related->name }}" class="w-full h-40 object-cover">
                         @else
                             <div class="w-full h-40 bg-green-100 flex items-center justify-center">
                                 <i class="fas fa-glass-whiskey text-4xl text-green-300"></i>

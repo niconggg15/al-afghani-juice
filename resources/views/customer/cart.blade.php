@@ -57,7 +57,11 @@
                                     $bgGradient = 'from-sky-400 to-indigo-500';
                                 }
 
-                                $imgUrl = ($item['image'] && !str_contains($item['image'], 'svg') && !str_contains($item['image'], 'glass') && !str_contains($item['image'], 'cup')) ? asset('storage/' . $item['image']) : null;
+                                // Diperbaiki agar langsung membaca jalur file gambar dengan benar
+                                $imgUrl = null;
+                                if (!empty($item['image']) && !str_contains($item['image'], 'svg') && !str_contains($item['image'], 'glass') && !str_contains($item['image'], 'cup')) {
+                                    $imgUrl = str_starts_with($item['image'], 'http') ? $item['image'] : asset($item['image']);
+                                }
                             @endphp
 
                             <div class="py-4 flex items-center gap-4">
@@ -196,7 +200,6 @@
 
 @section('scripts')
 <script>
-    // Validasi sederhana sebelum form dikirim
     document.getElementById('checkout-form')?.addEventListener('submit', function(e) {
         const nameInput = document.getElementById('customer_name');
         if (nameInput && nameInput.value.trim() === '') {

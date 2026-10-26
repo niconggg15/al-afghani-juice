@@ -49,23 +49,41 @@ Route::prefix('checkout')->name('customer.')->group(function () {
 });
 
 // Cashier Routes - Kelola Pesanan, Uang Masukan Cash, & QRIS
-Route::prefix('cashier')->name('cashier.')->middleware(['auth', 'role:cashier,admin'])->group(function () {
-    Route::get('/', [CashierDashboardController::class, 'index'])->name('dashboard');
-    Route::get('/orders', [CashierOrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/{order}', [CashierOrderController::class, 'show'])->name('orders.show');
-    Route::put('/orders/{order}/status', [CashierOrderController::class, 'updateStatus'])->name('orders.update-status');
-    Route::post('/orders/{order}/confirm-payment', [CashierOrderController::class, 'confirmPayment'])->name('orders.confirm-payment');
-    Route::post('/orders/{order}/confirm-cash', [CashierOrderController::class, 'confirmCashPayment'])->name('orders.confirm-cash');
-    Route::post('/orders/{order}/auto-qris', [CashierOrderController::class, 'autoConfirmQris'])->name('orders.auto-qris');
+Route::prefix('cashier')->name('cashier.')->middleware('auth')->group(function () {
+    Route::get('/orders/history', [CashierOrderController::class, 'history'])
+        ->middleware('role:cashier,admin,analyst')
+        ->name('orders.history');
+
+    Route::middleware('role:cashier,admin')->group(function () {
+        Route::get('/', [CashierDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/orders', [CashierOrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/{order}', [CashierOrderController::class, 'show'])->name('orders.show');
+        Route::put('/orders/{order}/status', [CashierOrderController::class, 'updateStatus'])->name('orders.update-status');
+        Route::post('/orders/{order}/confirm-payment', [CashierOrderController::class, 'confirmPayment'])->name('orders.confirm-payment');
+        Route::post('/orders/{order}/confirm-cash', [CashierOrderController::class, 'confirmCashPayment'])->name('orders.confirm-cash');
+        Route::post('/orders/{order}/auto-qris', [CashierOrderController::class, 'autoConfirmQris'])->name('orders.auto-qris');
+    });
 });
 
 // Admin Routes - Kelola Kategori, Produk, & Stok Jus
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
-    
-    Route::resource('categories', CategoryController::class);
-    Route::resource('products', ProductController::class);
-    Route::put('products/{product}/stock', [ProductController::class, 'updateStock'])->name('products.update-stock');
+Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
+    Route::get('products/create', [ProductController::class, 'create'])
+        ->middleware('role:admin')
+        ->name('products.create');
+
+    Route::middleware('role:admin,analyst')->group(function () {
+        Route::get('/', function () {
+            return view('admin.dashboard');
+        })->name('dashboard');
+
+        Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
+        Route::get('products', [ProductController::class, 'index'])->name('products.index');
+        Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
+    });
+    Route::middleware('role:admin')->group(function () {
+        Route::resource('categories', CategoryController::class)->except(['index', 'show']);
+        Route::resource('categories', CategoryController::class)->except(['index', 'show']);
+        Route::resource('products', ProductController::class)->except(['index', 'show', 'create']);
+        Route::put('products/{product}/stock', [ProductController::class, 'updateStock'])->name('products.update-stock');
+    });
 });

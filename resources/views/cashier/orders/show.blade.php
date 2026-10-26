@@ -8,8 +8,8 @@
         <h1 class="text-3xl font-bold text-gray-800">Detail Pesanan</h1>
         <p class="text-gray-600">{{ $order->order_number }}</p>
     </div>
-    <a href="{{ route('cashier.orders.index') }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-        <i class="fas fa-arrow-left mr-2"></i>Kembali
+    <a href="{{ route('cashier.orders.index') }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2 bg-white shadow-sm">
+        <i class="fas fa-arrow-left"></i>Kembali
     </a>
 </div>
 
@@ -51,15 +51,15 @@
             <div class="space-y-3">
                 @foreach($order->items as $item)
                     <div class="flex gap-4 p-3 border border-gray-200 rounded-lg">
-                        @if($item->product->image)
-                            <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}" class="w-16 h-16 object-cover rounded">
+                        @if($item->product && $item->product->image)
+                            <img src="{{ str_starts_with($item->product->image, 'http') ? $item->product->image : asset($item->product->image) }}" alt="{{ $item->product->name }}" class="w-16 h-16 object-cover rounded shadow-sm border border-gray-200">
                         @else
                             <div class="w-16 h-16 bg-green-100 rounded flex items-center justify-center">
                                 <i class="fas fa-glass-whiskey text-2xl text-green-300"></i>
                             </div>
                         @endif
                         <div class="flex-1">
-                            <h3 class="font-medium">{{ $item->product->name }}</h3>
+                            <h3 class="font-medium">{{ $item->product->name ?? 'Produk' }}</h3>
                             <p class="text-sm text-gray-500">Rp {{ number_format($item->price, 0, ',', '.') }} x {{ $item->quantity }}</p>
                             @if($item->notes)
                                 <p class="text-xs text-gray-400 mt-1">{{ $item->notes }}</p>
@@ -75,7 +75,6 @@
                     <span class="text-gray-600">Subtotal</span>
                     <span>Rp {{ number_format($order->subtotal, 0, ',', '.') }}</span>
                 </div>
-                <!-- PPN sudah dihapus -->
                 <div class="flex justify-between text-lg font-bold text-green-600 border-t border-gray-200 pt-2">
                     <span>Total</span>
                     <span>Rp {{ number_format($order->total, 0, ',', '.') }}</span>
@@ -92,12 +91,10 @@
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Status Baru</label>
                     <select name="status" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
-                        <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Pending</option>
-                        <option value="confirmed" {{ $order->status === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                        <option value="preparing" {{ $order->status === 'preparing' ? 'selected' : '' }}>Preparing</option>
-                        <option value="ready" {{ $order->status === 'ready' ? 'selected' : '' }}>Ready</option>
-                        <option value="completed" {{ $order->status === 'completed' ? 'selected' : '' }}>Completed</option>
-                        <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                        <option value="pending" {{ $order->status === 'pending' ? 'selected' : '' }}>Menunggu Konfirmasi</option>
+                        <option value="ready" {{ $order->status === 'ready' ? 'selected' : '' }}>Siap Diambil</option>
+                        <option value="completed" {{ $order->status === 'completed' ? 'selected' : '' }}>Selesai</option>
+                        <option value="cancelled" {{ $order->status === 'cancelled' ? 'selected' : '' }}>Dibatalkan</option>
                     </select>
                 </div>
                 <button type="submit" class="btn-green px-6 py-2">
@@ -108,7 +105,7 @@
             @if($order->status !== 'completed' && $order->payment && $order->payment->status !== 'paid')
                 <form action="{{ route('cashier.orders.confirm-payment', $order) }}" method="POST" class="mt-4 pt-4 border-t border-gray-200">
                     @csrf
-                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700" onclick="return confirm('Konfirmasi pembayaran sudah diterima?')">
+                    <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium" onclick="return confirm('Konfirmasi pembayaran sudah diterima?')">
                         <i class="fas fa-money-check-alt mr-2"></i>Konfirmasi Pembayaran
                     </button>
                 </form>
@@ -122,13 +119,13 @@
         <div class="bg-white rounded-xl shadow-md p-6">
             <h2 class="text-lg font-semibold mb-4">Status Saat Ini</h2>
             <div class="text-center">
-                <span class="px-4 py-2 text-lg rounded-full {{ 
+                <span class="px-4 py-2 text-sm font-semibold rounded-full inline-block {{ 
                     $order->status === 'pending' ? 'bg-orange-100 text-orange-800' : 
-                    ($order->status === 'confirmed' ? 'bg-blue-100 text-blue-800' : 
-                    ($order->status === 'preparing' ? 'bg-purple-100 text-purple-800' : 
                     ($order->status === 'ready' ? 'bg-green-100 text-green-800' : 
-                    ($order->status === 'completed' ? 'bg-gray-100 text-gray-800' : 'bg-red-100 text-red-800')))) 
-                }} capitalize">{{ $order->status }}</span>
+                    ($order->status === 'completed' ? 'bg-gray-100 text-gray-800' : 'bg-red-100 text-red-800')) 
+                }}">
+                    {{ $order->status === 'pending' ? 'Menunggu Konfirmasi' : ($order->status === 'ready' ? 'Siap Diambil' : ($order->status === 'completed' ? 'Selesai' : 'Dibatalkan')) }}
+                </span>
             </div>
             
             <div class="mt-4 space-y-2 text-sm">

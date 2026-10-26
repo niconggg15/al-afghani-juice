@@ -27,9 +27,29 @@
         .product-card:hover { transform: translateY(-6px); box-shadow: 0 25px 50px rgba(0,0,0,0.15); }
         .btn-juice { background: linear-gradient(135deg, #FF6B6B 0%, #FF9F43 100%); transition: all 0.3s; }
         .btn-juice:hover { transform: scale(1.02); box-shadow: 0 10px 25px rgba(255,107,107,0.4); }
-        .floating-bubbles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
-        .bubble { position: absolute; border-radius: 50%; background: rgba(255,255,255,0.1); animation: floatUp 15s infinite; }
-        @keyframes floatUp { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-100px) scale(1); opacity: 0; } }
+        
+        .floating-bubbles { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100vh; 
+            pointer-events: none; 
+            z-index: 0; 
+            overflow: hidden; 
+        }
+        .bubble { 
+            position: absolute; 
+            bottom: -60px; 
+            border-radius: 50%; 
+            animation: floatUp linear infinite; 
+        }
+        @keyframes floatUp { 
+            0% { transform: translateY(0) scale(0.5); opacity: 0; } 
+            15% { opacity: 0.7; } 
+            85% { opacity: 0.7; } 
+            100% { transform: translateY(-110vh) scale(1.2); opacity: 0; } 
+        }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -84,22 +104,31 @@
         function createBubbles() {
             const container = document.getElementById('bubbles');
             if (!container) return;
-            const colors = ['rgba(255,107,107,0.1)', 'rgba(255,159,67,0.1)', 'rgba(255,217,61,0.1)', 'rgba(116,185,255,0.1)', 'rgba(162,155,254,0.1)'];
-            for (let i = 0; i < 15; i++) {
+            const colors = [
+                'rgba(255,107,107,0.25)', 
+                'rgba(255,159,67,0.25)', 
+                'rgba(255,217,61,0.25)', 
+                'rgba(116,185,255,0.25)', 
+                'rgba(255,154,162,0.25)',
+                'rgba(199,206,234,0.25)'
+            ];
+            
+            for (let i = 0; i < 35; i++) {
                 const bubble = document.createElement('div');
                 bubble.className = 'bubble';
                 bubble.style.left = Math.random() * 100 + '%';
-                bubble.style.width = bubble.style.height = (Math.random() * 60 + 20) + 'px';
+                const size = Math.random() * 45 + 15; 
+                bubble.style.width = size + 'px';
+                bubble.style.height = size + 'px';
                 bubble.style.background = colors[Math.floor(Math.random() * colors.length)];
-                bubble.style.animationDelay = Math.random() * 15 + 's';
-                bubble.style.animationDuration = (Math.random() * 10 + 15) + 's';
+                bubble.style.animationDelay = (Math.random() * 10) + 's';
+                bubble.style.animationDuration = (Math.random() * 6 + 6) + 's';
                 container.appendChild(bubble);
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             createBubbles();
-            // Bersihkan data localStorage lama agar tidak mengganggu hitungan session Laravel
             localStorage.removeItem('cart');
         });
     </script>

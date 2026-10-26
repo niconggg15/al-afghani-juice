@@ -11,11 +11,22 @@ class UserSeeder extends Seeder
     public function run()
     {
         User::updateOrCreate(
-            ['email' => 'kedaijuice123@gmail.com'],
+            ['email' => 'alafghanijuice@gmail.com'],
             [
                 'name' => 'Admin Al Afghani Juice',
+                'username' => null,
                 'password' => Hash::make('juiceenak321'),
-                'role' => 'admin', // atau 'cashier'
+                'role' => 'admin',
+            ]
+        );
+
+        User::updateOrCreate(
+            ['email' => 'juiceenak@al-afghani-juice.local'],
+            [
+                'name' => 'Akun Analisa Guru',
+                'username' => 'juiceenak',
+                'password' => Hash::make('enakbanget123'),
+                'role' => 'admin',
             ]
         );
     }

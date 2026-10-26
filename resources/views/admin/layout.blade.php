@@ -36,9 +36,11 @@
                     <i class="fas fa-chart-line text-xs"></i> Dashboard
                 </a>
 
-                <a href="{{ route('cashier.dashboard') }}" class="text-white hover:text-green-200 whitespace-nowrap flex items-center gap-1.5">
-                    <i class="fas fa-cash-register text-xs"></i> Pesanan Kasir
-                </a>
+                @if(auth()->user()->role !== 'analyst')
+                    <a href="{{ route('cashier.dashboard') }}" class="text-white hover:text-green-200 whitespace-nowrap flex items-center gap-1.5">
+                        <i class="fas fa-cash-register text-xs"></i> Pesanan Kasir
+                    </a>
+                @endif
             </div>
         </nav>
     </header>

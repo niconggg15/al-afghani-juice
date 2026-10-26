@@ -6,16 +6,16 @@
 <div class="max-w-4xl mx-auto">
     <div class="mb-8 flex items-center justify-between">
         <h1 class="text-3xl font-bold text-gray-800">Detail Produk</h1>
-        <a href="{{ route('admin.products.index') }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+        <a href="{{ route('admin.products.index') }}" class="px-4 py-2 bg-white rounded-xl border border-gray-200 hover:border-orange-300 text-gray-600 font-medium flex items-center gap-2 shadow-sm transition-all">
             <i class="fas fa-arrow-left mr-2"></i>Kembali
         </a>
     </div>
 
     <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="md:flex">
-            <div class="md:w-1/3 p-6 bg-gray-50 border-r border-gray-200">
+            <div class="md:w-1/3 p-6 bg-gray-50 border-r border-gray-200 flex items-center justify-center">
                 @if($product->image)
-                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="w-full h-64 object-cover rounded-lg">
+                    <img src="{{ str_starts_with($product->image, 'http') ? $product->image : asset($product->image) }}" alt="{{ $product->name }}" class="w-full h-64 object-cover rounded-lg shadow-sm border border-gray-200">
                 @else
                     <div class="w-full h-64 bg-green-100 rounded-lg flex items-center justify-center">
                         <i class="fas fa-glass-whiskey text-6xl text-green-300"></i>
@@ -25,7 +25,7 @@
             
             <div class="md:w-2/3 p-6">
                 <div class="flex items-center gap-2 mb-3">
-                    <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">{{ $product->category->name }}</span>
+                    <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">{{ $product->category->name ?? '-' }}</span>
                     @if($product->is_featured)
                         <span class="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">Unggulan</span>
                     @endif
@@ -60,20 +60,22 @@
             </div>
         </div>
         
-        <div class="p-6 border-t border-gray-200">
-            <div class="flex gap-4">
-                <a href="{{ route('admin.products.edit', $product) }}" class="btn-green px-6 py-2">
-                    <i class="fas fa-edit mr-2"></i>Edit
-                </a>
-                <form action="{{ route('admin.products.destroy', $product) }}" method="POST" class="inline">
-                    @method('DELETE')
-                    @csrf
-                    <button type="submit" onclick="return confirm('Hapus produk ini?')" class="px-6 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 flex items-center gap-2">
-                        <i class="fas fa-trash"></i>Hapus
-                    </button>
-                </form>
+        @if(auth()->user()->role === 'admin')
+            <div class="p-6 border-t border-gray-200">
+                <div class="flex gap-4">
+                    <a href="{{ route('admin.products.edit', $product) }}" class="btn-green px-6 py-2">
+                        <i class="fas fa-edit mr-2"></i>Edit
+                    </a>
+                    <form action="{{ route('admin.products.destroy', $product) }}" method="POST" class="inline">
+                        @method('DELETE')
+                        @csrf
+                        <button type="submit" onclick="return confirm('Hapus produk ini?')" class="px-6 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 flex items-center gap-2">
+                            <i class="fas fa-trash"></i>Hapus
+                        </button>
+                    </form>
+                </div>
             </div>
-        </div>
+        @endif
     </div>
 </div>
 @endsection

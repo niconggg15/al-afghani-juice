@@ -38,9 +38,9 @@
                 @csrf
                 
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input type="email" name="email" id="email" required 
-                           value="{{ old('email') }}"
+                    <label for="login" class="block text-sm font-medium text-gray-700 mb-1">Username atau Email</label>
+                    <input type="text" name="login" id="login" required
+                           value="{{ old('login') }}"
                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                            autofocus>
                 </div>
