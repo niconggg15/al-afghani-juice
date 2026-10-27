@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Cashier;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -114,13 +115,38 @@ class OrderController extends Controller
             'status' => 'required|in:pending,ready,completed,cancelled',
         ]);
 
-        $data = ['status' => $request->status];
+        DB::transaction(function () use ($order, $request) {
+            $lockedOrder = Order::query()
+                ->lockForUpdate()
+                ->findOrFail($order->getKey());
 
-        if ($request->status === 'completed' && !$order->completed_at) {
-            $data['completed_at'] = now();
-        }
+            if (
+                $request->status === 'cancelled'
+                && $lockedOrder->status !== 'cancelled'
+                && !config('database.connections.mysql.supports_order_routines')
+            ) {
+                $items = DB::table('order_items')
+                    ->where('order_id', $lockedOrder->id)
+                    ->select('product_id')
+                    ->selectRaw('SUM(quantity) as quantity')
+                    ->groupBy('product_id')
+                    ->get();
 
-        $order->update($data);
+                foreach ($items as $item) {
+                    DB::table('products')
+                        ->where('id', $item->product_id)
+                        ->increment('stock', $item->quantity);
+                }
+            }
+
+            $data = ['status' => $request->status];
+
+            if ($request->status === 'completed' && !$lockedOrder->completed_at) {
+                $data['completed_at'] = now();
+            }
+
+            $lockedOrder->update($data);
+        });
 
         return back()->with('success', 'Status pesanan berhasil diperbarui!');
     }

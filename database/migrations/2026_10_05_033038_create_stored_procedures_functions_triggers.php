@@ -7,6 +7,10 @@ return new class extends Migration
 {
     public function up()
     {
+        if (!config('database.connections.mysql.supports_order_routines')) {
+            return;
+        }
+
         // Drop existing procedures/functions/triggers if they exist
         DB::unprepared('DROP PROCEDURE IF EXISTS sp_create_order');
         DB::unprepared('DROP PROCEDURE IF EXISTS sp_update_stock');
