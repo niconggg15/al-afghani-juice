@@ -16,19 +16,19 @@
 <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
     <div class="rounded-xl bg-white p-5 shadow-md">
         <p class="text-sm text-gray-500">Pesanan Hari Ini</p>
-        <p class="min-h-8 text-2xl font-bold text-gray-800"></p>
+        <p class="text-2xl font-bold text-gray-800">0</p>
     </div>
     <div class="rounded-xl bg-white p-5 shadow-md">
         <p class="text-sm text-gray-500">Selesai Hari Ini</p>
-        <p class="min-h-8 text-2xl font-bold text-gray-800"></p>
+        <p class="text-2xl font-bold text-gray-800">0</p>
     </div>
     <div class="rounded-xl bg-white p-5 shadow-md">
         <p class="text-sm text-gray-500">Pendapatan Hari Ini</p>
-        <p class="min-h-8 text-2xl font-bold text-gray-800"></p>
+        <p class="text-2xl font-bold text-gray-800">Rp 0</p>
     </div>
     <div class="rounded-xl bg-white p-5 shadow-md">
         <p class="text-sm text-gray-500">Menunggu Konfirmasi</p>
-        <p class="min-h-8 text-2xl font-bold text-gray-800"></p>
+        <p class="text-2xl font-bold text-gray-800">0</p>
     </div>
 </div>
 
