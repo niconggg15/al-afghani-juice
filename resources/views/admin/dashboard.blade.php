@@ -4,8 +4,8 @@
 
 @section('content')
 <div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-800">Dashboard Admin</h1>
-    <p class="text-gray-600">Kelola kategori dan produk</p>
+    <h1 class="text-3xl font-bold text-gray-800">{{ auth()->user()->isCashier() ? 'Dashboard' : 'Dashboard Admin' }}</h1>
+    <p class="text-gray-600">{{ auth()->user()->isCashier() ? 'Ringkasan toko. Buka Pesanan Kasir untuk mengelola pesanan.' : 'Kelola kategori dan produk' }}</p>
 </div>
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -58,6 +58,11 @@
     </div>
 </div>
 
+@if(auth()->user()->isCashier())
+    <a href="{{ route('cashier.dashboard') }}" class="inline-flex items-center gap-2 rounded-lg bg-green-600 px-5 py-3 font-semibold text-white hover:bg-green-700">
+        <i class="fas fa-cash-register"></i> Buka Pesanan Kasir
+    </a>
+@else
 <div class="grid lg:grid-cols-2 gap-6">
     <div class="bg-white rounded-xl shadow-md p-6">
         <div class="flex items-center justify-between mb-4">
@@ -112,4 +117,5 @@
         @endif
     </div>
 </div>
+@endif
 @endsection

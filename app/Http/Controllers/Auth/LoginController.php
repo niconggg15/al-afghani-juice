@@ -18,7 +18,7 @@ class LoginController extends Controller
             }
 
             if ($user->isCashier()) {
-                return redirect()->route('cashier.dashboard');
+                return redirect()->route('admin.dashboard');
             }
 
             return redirect()->route('customer.menu');
@@ -51,7 +51,7 @@ class LoginController extends Controller
             if ($user->isAdmin()) {
                 return redirect()->intended(route('admin.dashboard'));
             } elseif ($user->isCashier()) {
-                return redirect()->intended(route('cashier.dashboard'));
+                return redirect()->route('admin.dashboard');
             }
 
             if ($user->role === 'analyst') {
