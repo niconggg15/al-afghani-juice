@@ -14,7 +14,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm text-gray-500">Total Pesanan Hari Ini</p>
-                <p class="text-3xl font-bold text-gray-800">{{ $todayStats['total_orders'] }}</p>
+                <p class="min-h-9 text-3xl font-bold text-gray-800"></p>
             </div>
             <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                 <i class="fas fa-shopping-bag text-2xl text-blue-600"></i>
@@ -26,7 +26,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm text-gray-500">Pesanan Selesai</p>
-                <p class="text-3xl font-bold text-gray-800">{{ $todayStats['completed_orders'] }}</p>
+                <p class="min-h-9 text-3xl font-bold text-gray-800"></p>
             </div>
             <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                 <i class="fas fa-check-circle text-2xl text-green-600"></i>
@@ -38,7 +38,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm text-gray-500">Pendapatan Hari Ini</p>
-                <p class="text-3xl font-bold text-gray-800">Rp {{ number_format($todayStats['total_revenue'], 0, ',', '.') }}</p>
+                <p class="min-h-9 text-3xl font-bold text-gray-800"></p>
             </div>
             <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center" title="Klik untuk membuka riwayat pesanan">
                 <i class="fas fa-coins text-2xl text-yellow-600"></i>
@@ -51,7 +51,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-sm text-gray-500">Menunggu Konfirmasi</p>
-                <p class="text-3xl font-bold text-gray-800">{{ $todayStats['pending_count'] }}</p>
+                <p class="min-h-9 text-3xl font-bold text-gray-800"></p>
             </div>
             <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
                 <i class="fas fa-clock text-2xl text-orange-600"></i>
