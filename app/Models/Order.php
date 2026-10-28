@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Order extends Model
 {
@@ -12,6 +13,7 @@ class Order extends Model
     protected $fillable = [
         'order_number',
         'user_id',
+        'is_demo',
         'customer_name',
         'customer_phone',
         'status',
@@ -26,6 +28,7 @@ class Order extends Model
     ];
 
     protected $casts = [
+        'is_demo' => 'boolean',
         'subtotal' => 'decimal:2',
         'tax' => 'decimal:2',
         'discount' => 'decimal:2',
@@ -47,6 +50,13 @@ class Order extends Model
     public function payment()
     {
         return $this->hasOne(Payment::class);
+    }
+
+    public function scopeVisibleToCurrentAccount(Builder $query)
+    {
+        $user = auth()->user();
+
+        return $query->where('is_demo', $user && $user->isDemoAccount());
     }
 
     public static function generateOrderNumber()

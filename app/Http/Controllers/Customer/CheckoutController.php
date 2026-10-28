@@ -41,14 +41,17 @@ class CheckoutController extends Controller
             return back()->with('error', 'Keranjang kosong');
         }
 
+        $isDemoOrder = auth()->user() && auth()->user()->isDemoAccount();
+
         try {
-            $order = DB::transaction(function () use ($request, $cart) {
+            $order = DB::transaction(function () use ($request, $cart, $isDemoOrder) {
                 $subtotal = collect($cart)->sum(fn($item) => $item['price'] * $item['quantity']);
                 $total = $subtotal;
                 $paymentMethod = $request->payment_method ?? 'cash';
 
                 $order = Order::create([
                     'order_number' => Order::generateOrderNumber(),
+                    'is_demo' => $isDemoOrder,
                     'customer_name' => $request->customer_name,
                     'customer_phone' => $request->customer_phone ?? '-',
                     'payment_method' => $paymentMethod,
@@ -76,7 +79,9 @@ class CheckoutController extends Controller
                         'notes' => $item['notes'] ?? null,
                     ]);
 
-                    $product->decrement('stock', $item['quantity']);
+                    if (!$isDemoOrder) {
+                        $product->decrement('stock', $item['quantity']);
+                    }
                 }
 
                 Payment::create([

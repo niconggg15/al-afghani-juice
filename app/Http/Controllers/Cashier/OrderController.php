@@ -10,27 +10,28 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $pendingOrders = Order::with(['items.product', 'payment', 'user'])
+        $orders = Order::visibleToCurrentAccount();
+        $pendingOrders = (clone $orders)->with(['items.product', 'payment', 'user'])
             ->where('status', 'pending')
             ->latest()
             ->get();
 
-        $readyOrders = Order::with(['items.product', 'payment', 'user'])
+        $readyOrders = (clone $orders)->with(['items.product', 'payment', 'user'])
             ->where('status', 'ready')
             ->latest()
             ->get();
 
         $todayStats = [
-            'total_orders' => Order::where(function ($query) {
+            'total_orders' => (clone $orders)->where(function ($query) {
                 $query->whereDate('created_at', today())
                     ->orWhere(function ($completed) {
                         $completed->where('status', 'completed')
                             ->whereDate('completed_at', today());
                     });
             })->count(),
-            'completed_orders' => Order::whereDate('completed_at', today())->where('status', 'completed')->count(),
-            'total_revenue' => Order::whereDate('completed_at', today())->where('status', 'completed')->sum('total'),
-            'pending_count' => Order::where('status', 'pending')->count(),
+            'completed_orders' => (clone $orders)->whereDate('completed_at', today())->where('status', 'completed')->count(),
+            'total_revenue' => (clone $orders)->whereDate('completed_at', today())->where('status', 'completed')->sum('total'),
+            'pending_count' => (clone $orders)->where('status', 'pending')->count(),
         ];
 
         return view('cashier.orders.index', compact('pendingOrders', 'readyOrders', 'todayStats'));
@@ -44,7 +45,8 @@ class OrderController extends Controller
         ]);
 
         $archiveBefore = now()->subHours(24);
-        $historyQuery = Order::with(['payment', 'user'])
+        $visibleOrders = Order::visibleToCurrentAccount();
+        $historyQuery = (clone $visibleOrders)->with(['payment', 'user'])
             ->where(function ($query) use ($archiveBefore) {
                 $query->where(function ($completed) use ($archiveBefore) {
                     $completed->where('status', 'completed')
@@ -64,7 +66,7 @@ class OrderController extends Controller
             $historyQuery->whereDate('created_at', '<=', $filters['date_to']);
         }
 
-        $completedOrdersQuery = Order::where('status', 'completed')
+        $completedOrdersQuery = (clone $visibleOrders)->where('status', 'completed')
             ->whereNotNull('completed_at');
         $recentCompletedQuery = (clone $completedOrdersQuery)
             ->where('completed_at', '>', $archiveBefore);
@@ -104,12 +106,14 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
+        $this->ensureOrderIsVisibleToCurrentAccount($order);
         $order->load(['items.product', 'payment', 'user']);
         return view('cashier.orders.show', compact('order'));
     }
 
     public function updateStatus(Request $request, Order $order)
     {
+        $this->ensureOrderIsVisibleToCurrentAccount($order);
         $request->validate([
             'status' => 'required|in:pending,ready,completed,cancelled',
         ]);
@@ -127,6 +131,7 @@ class OrderController extends Controller
 
     public function confirmPayment(Order $order)
     {
+        $this->ensureOrderIsVisibleToCurrentAccount($order);
         // Ubah status ke 'ready' (Siap Diambil) setelah pembayaran dikonfirmasi
         $order->update([
             'status' => 'ready',
@@ -145,11 +150,20 @@ class OrderController extends Controller
 
     public function complete(Order $order)
     {
+        $this->ensureOrderIsVisibleToCurrentAccount($order);
         $order->update([
             'status' => 'completed',
             'completed_at' => now(),
         ]);
 
         return back()->with('success', 'Pesanan telah diselesaikan!');
+    }
+
+    private function ensureOrderIsVisibleToCurrentAccount(Order $order)
+    {
+        abort_unless(
+            (bool) $order->is_demo === auth()->user()->isDemoAccount(),
+            404
+        );
     }
 }

@@ -20,14 +20,16 @@ class UserSeeder extends Seeder
             ]
         );
 
-        User::updateOrCreate(
-            ['email' => 'juiceenak@al-afghani-juice.local'],
-            [
-                'name' => 'Akun Analisa Guru',
-                'username' => 'juiceenak',
-                'password' => Hash::make('enakbanget123'),
-                'role' => 'admin',
-            ]
-        );
+        if (config('app.demo_account_enabled')) {
+            User::updateOrCreate(
+                ['email' => 'juiceenak@al-afghani-juice.local'],
+                [
+                    'name' => 'Akun Analisa Guru',
+                    'username' => 'juiceenak',
+                    'password' => Hash::make('enakbanget123'),
+                    'role' => 'admin',
+                ]
+            );
+        }
     }
 }

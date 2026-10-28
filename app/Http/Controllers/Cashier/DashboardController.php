@@ -10,21 +10,23 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        $orders = Order::visibleToCurrentAccount();
+
         // Mengelompokkan pesanan berdasarkan statusnya
-        $pendingOrders = Order::with(['items.product', 'payment'])->where('status', 'pending')->latest()->get();
-        $preparingOrders = Order::with(['items.product', 'payment'])->whereIn('status', ['confirmed', 'preparing'])->latest()->get();
-        $readyOrders = Order::with(['items.product', 'payment'])->where('status', 'ready')->latest()->get();
+        $pendingOrders = (clone $orders)->with(['items.product', 'payment'])->where('status', 'pending')->latest()->get();
+        $preparingOrders = (clone $orders)->with(['items.product', 'payment'])->whereIn('status', ['confirmed', 'preparing'])->latest()->get();
+        $readyOrders = (clone $orders)->with(['items.product', 'payment'])->where('status', 'ready')->latest()->get();
         
         // Statistik hari ini dalam bentuk variabel individu
-        $totalOrdersToday = Order::where(function ($query) {
+        $totalOrdersToday = (clone $orders)->where(function ($query) {
             $query->whereDate('created_at', today())
                 ->orWhere(function ($completed) {
                     $completed->where('status', 'completed')
                         ->whereDate('completed_at', today());
                 });
         })->count();
-        $completedOrdersToday = Order::whereDate('completed_at', today())->where('status', 'completed')->count();
-        $revenueToday = Order::whereDate('completed_at', today())->where('status', 'completed')->sum('total');
+        $completedOrdersToday = (clone $orders)->whereDate('completed_at', today())->where('status', 'completed')->count();
+        $revenueToday = (clone $orders)->whereDate('completed_at', today())->where('status', 'completed')->sum('total');
 
         // Statistik hari ini dalam bentuk array (untuk mengantisipasi $todayStats di view)
         $todayStats = [

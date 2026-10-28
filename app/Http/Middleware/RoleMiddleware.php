@@ -16,6 +16,10 @@ class RoleMiddleware
 
         $user = Auth::user();
 
+        if ($user->isDemoAccount() && !config('app.demo_account_enabled')) {
+            abort(403, 'Unauthorized');
+        }
+
         if (!in_array($user->role, $roles)) {
             abort(403, 'Unauthorized');
         }

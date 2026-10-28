@@ -45,9 +45,17 @@ class LoginController extends Controller
         ];
 
         if (Auth::attempt($authCredentials, $request->boolean('remember'))) {
+            $user = Auth::user();
+            if ($user->isDemoAccount() && !config('app.demo_account_enabled')) {
+                Auth::logout();
+
+                return back()->withErrors([
+                    'login' => 'Username/email atau password salah',
+                ])->onlyInput('login');
+            }
+
             $request->session()->regenerate();
 
-            $user = Auth::user();
             if ($user->isAdmin()) {
                 return redirect()->intended(route('admin.dashboard'));
             } elseif ($user->isCashier()) {
